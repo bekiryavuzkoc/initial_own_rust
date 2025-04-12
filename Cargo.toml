@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = "0.7"
+axum = {version = "0.6.20", features = ["headers"]}
+log = "0.4.27"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.68"
 tokio = { version = "1.44.2", features = ["full"] }
