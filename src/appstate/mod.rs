@@ -36,4 +36,18 @@ impl SubscriberAppState {
             }
         }
     }
+
+    pub async fn delete_email(&self, id: i32) -> Result<(), sqlx::Error> {
+        let result = sqlx::query("DELETE FROM subscribers WHERE id = ?")
+        .bind(id)
+        .execute(&self.db).await;
+
+        match result {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                eprintln!("Failed to delete the subscriber: {}", e);
+                Err(e)
+            }
+        }
+    }
 }

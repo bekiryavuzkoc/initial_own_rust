@@ -1,8 +1,10 @@
+use axum::extract::Path;
 use axum::routing::get;
 use axum::{Router, routing::post};
 use axum::{
     extract::{State, Json},
     http::StatusCode,
+    routing::delete,
     response::IntoResponse,
 };
 use std::sync::Arc;
@@ -43,9 +45,23 @@ pub async fn get_all_email_list(State(state): State<Arc<Mutex<SubscriberAppState
     Ok(Json(vec))
 }
 
+
+pub async fn delete_email(State(state): State<Arc<Mutex<SubscriberAppState>>>, Path(id): Path<i32>) -> Result<Json<String>, impl IntoResponse> {
+    let locked_state = state.lock().await;
+    let result = locked_state.delete_email(id).await;
+
+    
+    if result.is_err() {
+        return  Err((StatusCode::BAD_REQUEST, result.unwrap_err().to_string()));
+    }
+
+    return Ok(Json(String::from("Delete operation completed")));
+}
+
 pub fn routes(state: Arc<Mutex<SubscriberAppState>>) -> Router {
     Router::new()
         .route("/subscribe", post(subscribe))
         .route("/subscribers", get(get_all_email_list))
+        .route("/subscriber/:id", delete(delete_email))
         .with_state(state)
 }
